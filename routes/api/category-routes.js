@@ -6,8 +6,17 @@ const { Category, Product } = require('../../models');
 router.get('/', (req, res) => {
   try {
     //finalAll method obtains all entries from the table
-    const CategoryData = await Category.findAll();
-    res.status(200).json(CategoryData);
+    const CategoryData = await Category.findAll(
+      {
+        attributes: ['id', 'category_name'],
+        include: [
+          {
+            model: Product,
+            attributes: ['id', 'product_name', 'price', 'stock', 'category_id']
+          }
+        ]
+      }
+    ).then(res.status(200).json(CategoryData));
   } catch (err) {
     res.status(500).json(err);
   }
@@ -17,14 +26,12 @@ router.get('/:id', (req, res) => {
   try {
     //findByPk method obtains only a single entry from the table
     const CategoryData = await Category.findByPk(req.params.id, {
-      include: [{ model: Product, through: Trip, as: 'planned_trips' }]
+      include: [{ model: Product }]
     });
-
     if (!CategoryData) {
       res.status(404).json({ message: 'No Category found with this id!' });
       return;
     }
-
     res.status(200).json(CategoryData);
   } catch (err) {
     res.status(500).json(err);
@@ -66,12 +73,10 @@ router.delete('/:id', (req, res) => {
         id: req.params.id
       }
     });
-
     if (!CategoryData) {
       res.status(404).json({ message: 'No Category found with this id!' });
       return;
     }
-
     res.status(200).json(CategoryData);
   } catch (err) {
     res.status(500).json(err);
