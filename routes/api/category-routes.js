@@ -26,7 +26,10 @@ router.get('/:id', (req, res) => {
   try {
     //findByPk method obtains only a single entry from the table
     const CategoryData = await Category.findByPk(req.params.id, {
-      include: [{ model: Product }]
+      include: [{ 
+        model: Product, 
+        attributes: ['id', 'product_name', 'price', 'stock', 'category_id']     
+      }]
     });
     if (!CategoryData) {
       res.status(404).json({ message: 'No Category found with this id!' });
